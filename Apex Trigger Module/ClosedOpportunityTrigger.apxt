@@ -1,0 +1,21 @@
+trigger ClosedOpportunityTrigger on Opportunity (after insert, after update) {
+	List<Task> task = new List<Task>();
+    
+    for(Opportunity opp : Trigger.new){
+        if(Trigger.isInsert){
+            if(Opp.StageName == 'Closed Won'){
+                task.add(new Task(Subject = 'Follow Up Test Task' , WhatId = opp.Id));
+            }
+        }
+        
+        if(Trigger.isUpdate){
+            if(opp.StageName == 'Closed Won' && opp.StageName != Trigger.oldMap.get(opp.Id).StageName){
+                task.add(new Task(Subject = 'Follow Up Test Task', WhatId = opp.Id));
+            }
+        }
+    }
+    
+    if(task.size()>0){
+        Insert task;
+    }
+}
